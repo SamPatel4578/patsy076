@@ -73,13 +73,13 @@ class Reagent(ABC):
         pass
 
     def getName(self):
-        pass
+        return self.__name
 
     def getPotency(self):
-        pass
+        return self.__potency
 
-    def setPotency(self, potency):
-        pass
+    def setPotency(self, newPotency):
+        self.__potency = newPotency
 
 class Herb(Reagent):
     def _init_(self, name, potency, grimy = True):
@@ -87,13 +87,15 @@ class Herb(Reagent):
         self.__grimy = grimy
 
     def refine(self):
-        pass
+        self.setGrimy()
+        self.__potency = self.__potency * 2.5
+        print(f"The herb potency will increase 2.5 times its original and its not grimy")
 
     def getGrimy(self):
-        pass
+        return self.__grimy
 
     def setGrimy(self, grimy):
-        pass
+        self.__grimy = False
 
 class Catalyst(Reagent):
     def _init_(self, name, potency, quality):
@@ -101,10 +103,16 @@ class Catalyst(Reagent):
         self.__quality = quality
 
     def refine(self):
-        pass
+       if self.__quality < 8.9:
+            self.__quality += 1.1
+            print(f"Quality of the herb has increased by 1.1 The new quality is {self.__quality}")
+
+       elif self.__quality >= 8.9:
+           self.__quality = 10
+           print(f"The quality of the herb is at its maximum: {self.__quality}. It cannot be refined any furthur.")
 
     def getQuality(self):
-        pass
+       return self.__quality
 
 class Laboratory:
     def _init_(self):
