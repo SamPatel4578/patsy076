@@ -48,7 +48,7 @@ class SuperPotion(Potion):
         pass
 
 
-class ExtremePosition(Potion):
+class ExtremePotion(Potion):
     def _init_(self, name, stat, boost, reagent, potion):
         super()._init_(name, stat, boost)
         self.__reagent = reagent
@@ -121,36 +121,48 @@ class Laboratory:
         self.__catalysts = []
 
     def mixPotion(self, name, type, stat, primaryIngredient, secondaryIngredient):
-        pass
+        if type == "Super":
+            potion = SuperPotion(name, stat, primaryIngredient, secondaryIngredient)
+        elif type == "Extreme":
+            potion = ExtremePotion(name, stat, primaryIngredient, secondaryIngredient)
+        self.__potions.append(potion)
+        return potion 
 
     def addReagent(self, reagent, amount):
-        pass
+        if isinstance(reagent, Herb):
+            for herb in range(0, amount-1):
+                self.__herbs.append(reagent)
+        elif isinstance(reagent, Catalyst):
+            for catalyst in range(0, amount-1):
+                self.__catalysts.append(reagent)
+        return f"The reagent {reagent} was added successfully."
+
 
 class Alchemist:
-    def _init_(self, attack, strength, defense, magic, ranged, necromancy):
-        self.__attack = attack
-        self.__strength = strength
-        self.__defense = defense
-        self.__magic = magic
-        self.__ranged = ranged
-        self.__necromancy = necromancy
-        self.__laboratory = Laboratory(self)
+       def _init_(self, attack, strength, defense, magic, ranged, necromancy):
+        self.__attributes = {"attack":attack, "strength":strength, "defense":defense, "magic":magic, "ranged":ranged, "necromancy":necromancy}
+        self.__laboratory = Laboratory()
         self.__recipes = {}
 
-    def getLaboratory(self):
-        pass
+        def getLaboratory(self):
+            return self.__laboratory
 
-    def getRecipes(self):
-        pass
+        def getRecipes(self):
+            return self.__recipes
+    
+        def addRecipe(self, potion, firstIngredient, secondIngredient):
+            for key, value in self.__attributes.items():
+                self.__recipes[potion] = (firstIngredient, secondIngredient)
+                print(f"The recipe for {potion} was added successfully")
+    
+        def mixPotion(self, recipe):
+            recipe.mixPotion()
 
-    def mixPotion(self, recipe):
-        pass
+        def drinkPotion(self, potion):
+            pass
 
-    def drinkPotion(self, potion):
-        pass
+        def collectReagent(self, reagent, amount):
+            pass
 
-    def collectReagent(self, reagent, amount):
-        pass
-
-    def refineReagents(self):
-        pass
+        def refineReagents(self):
+            pass
