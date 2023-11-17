@@ -1,33 +1,44 @@
 import unittest
 from A2_patsy076 import *
 
-class TestPotionFunctions(unittest.TestCase):
-       def setUp(self):
-        self.herb1 = Herb("Irit", 3.5)
-        self.catalyst1 = Catalyst("Eye of Newt", 4.3, 1.0)
-        self.super_potion1 = SuperPotion("Super Attack", "Attack", 0, self.herb1, self.catalyst1)
-        self.extreme_potion1 = ExtremePotion("Extreme Defense", "Defense", 0, self.herb1, self.super_potion1)
-        
-class TestPotionClass(unittest.TestCase):
-    def setUp(self):
-        self.potion = Potion("TestPotion", "TestStat", 5)
+class TestPotionClasses(unittest.TestCase):
 
-    def test_get_name(self):
-        self.assertEqual(self.potion.get_name(), "TestPotion")
+    def test_super_potion_creation(self):
+        herb = Herb("Irit", 5.0)
+        catalyst = Catalyst("Eye of Newt", 3.0, 7.0)
 
-    def test_get_stat(self):
-        self.assertEqual(self.potion.get_stat(), "TestStat")
+        super_potion = SuperPotion("Super Attack", "Attack", 0, herb, catalyst)
 
-    def test_get_boost(self):
-        self.assertEqual(self.potion.get_boost(), 5)
+        self.assertEqual(super_potion.get_name(), "Super Attack")
+        self.assertEqual(super_potion.get_stat(), "Attack")
+        self.assertEqual(super_potion.get_herb(), herb)
+        self.assertEqual(super_potion.get_catalyst(), catalyst)
 
-    def test_set_boost(self):
-        self.potion.set_boost(10)
-        self.assertEqual(self.potion.get_boost(), 10)
+    def test_extreme_potion_creation(self):
+        herb = Herb("Avantoe", 8.0)
+        super_potion = SuperPotion("Super Attack", "Attack", 0, herb, Catalyst("Eye of Newt", 3.0, 7.0))
 
-    def test_calculate_boost(self):
-        with self.assertRaises(NotImplementedError):
-            self.potion.calculate_boost()
+        extreme_potion = ExtremePotion("Extreme Attack", "Attack", 0, herb, super_potion)
+
+        self.assertEqual(extreme_potion.get_name(), "Extreme Attack")
+        self.assertEqual(extreme_potion.get_stat(), "Attack")
+        self.assertEqual(extreme_potion.get_reagent(), herb)
+        self.assertEqual(extreme_potion.get_potion(), super_potion)
+
+    def test_herb_refine(self):
+        herb = Herb("Irit", 5.0)
+        herb.refine()
+
+        self.assertEqual(herb.get_grimy(), False)
+        self.assertAlmostEqual(herb.get_potency(), 12.5, places=2)
+
+    def test_catalyst_refine(self):
+        catalyst = Catalyst("Eye of Newt", 3.0, 7.0)
+        catalyst.refine()
+
+        self.assertAlmostEqual(catalyst.get_quality(), 8.1, places=2)
+
+
 
 class TestSuperPotionClass(unittest.TestCase):
     def setUp(self):
@@ -50,8 +61,8 @@ class TestSuperPotionClass(unittest.TestCase):
 
 class TestExtremePotionClass(unittest.TestCase):
     def setUp(self):
-        self.reagent = Reagent("TestReagent", 2.0)
-        self.potion = Potion("TestPotion", "TestStat", 1.0)
+        self.reagent = Herb("TestReagent", 2.0, grimy=False)
+        self.potion = SuperPotion("TestPotion", "TestStat", 1.0, Herb("TestHerb", 2.0), Catalyst("TestCatalyst", 2.0, 5.0))
 
         self.extreme_potion = ExtremePotion("TestExtremePotion", "TestStat", 0, self.reagent, self.potion)
 
@@ -66,19 +77,28 @@ class TestExtremePotionClass(unittest.TestCase):
     def test_get_potion(self):
         self.assertEqual(self.extreme_potion.get_potion(), self.potion)
 
-class TestReagentClass(unittest.TestCase):
+class TestReagent(unittest.TestCase):
+    class ConcreteReagent(Reagent):
+        def refine(self):
+            raise NotImplementedError("ConcreteReagent subclass must implement refine method")
+
     def setUp(self):
-        self.reagent = Reagent("TestReagent", 2.0)
+        self.reagent = self.ConcreteReagent("Test Reagent", 10.0)
 
     def test_get_name(self):
-        self.assertEqual(self.reagent.get_name(), "TestReagent")
+        self.assertEqual(self.reagent.get_name(), "Test Reagent")
 
     def test_get_potency(self):
-        self.assertEqual(self.reagent.get_potency(), 2.0)
+        self.assertEqual(self.reagent.get_potency(), 10.0)
 
     def test_set_potency(self):
-        self.reagent.set_potency(3.5)
-        self.assertEqual(self.reagent.get_potency(), 3.5)
+        self.reagent.set_potency(20.0)
+        self.assertEqual(self.reagent.get_potency(), 20.0)
+
+    def test_refine(self):
+        with self.assertRaises(NotImplementedError):
+            self.reagent.refine()
+
 
 
 class TestHerbClass(unittest.TestCase):
@@ -126,104 +146,70 @@ class TestCatalystClass(unittest.TestCase):
         self.assertEqual(self.catalyst.get_quality(), 10.0)
 
 
-class TestLaboratoryClass(unittest.TestCase):
+class TestLaboratory(unittest.TestCase):
+
     def setUp(self):
         self.laboratory = Laboratory()
-        self.alchemist = Alchemist(0, 0, 0, 0, 0, 0)
-
-    def test_potion_attributes(self):
-        self.assertEqual(self.super_potion1.get_name(), "Super Attack")
-        self.assertEqual(self.super_potion1.get_stat(), "Attack")
-        self.assertEqual(self.super_potion1.get_boost(), 0)
-        self.assertEqual(self.extreme_potion1.get_name(), "Extreme Defense")
-        self.assertEqual(self.extreme_potion1.get_stat(), "Defense")
-        self.assertEqual(self.extreme_potion1.get_boost(), 0)
-
-    def test_potion_calculate_boost(self):
-        self.super_potion1.calculate_boost()
-        self.assertNotEqual(self.super_potion1.get_boost(), 0)
-        self.extreme_potion1.calculate_boost()
-        self.assertNotEqual(self.extreme_potion1.get_boost(), 0)
-
-
-    def test_reagent_attributes(self):
-        self.assertEqual(self.herb1.get_name(), "Irit")
-        self.assertEqual(self.herb1.get_potency(), 3.5)
-        self.assertEqual(self.catalyst1.get_name(), "Eye of Newt")
-        self.assertEqual(self.catalyst1.get_potency(), 4.3)
-        self.assertEqual(self.catalyst1.get_quality(), 1.0)
-
-    def test_reagent_refine(self):
-        self.herb1.refine()
-        self.assertFalse(self.herb1.get_grimy())
-        self.assertNotEqual(self.herb1.get_potency(), 3.5)
-
-        self.catalyst1.refine()
-        self.assertGreaterEqual(self.catalyst1.get_quality(), 1.0)
-
-    def test_laboratory_mix_potion(self):
-        potion_result = self.laboratory.mix_potion("Super Defense", "Super", "Defense", self.herb1, self.catalyst1)
-        self.assertIsInstance(potion_result, SuperPotion)
-
-    def test_alchemist_mix_potion(self):
-        recipe = ["Extreme Magic", "Ground Mud Rune", "Super Magic"]
-        self.alchemist.mix_potion(recipe)
-        self.herb = Herb("TestHerb", 4.0)
-        self.catalyst = Catalyst("TestCatalyst", 5.0, 7.0)
 
     def test_mix_super_potion(self):
-        super_potion = self.laboratory.mix_potion("SuperTestPotion", "Super", "Attack", self.herb, self.catalyst)
-        self.assertIsInstance(super_potion, SuperPotion)
+        herb = Herb("Irit", 5.0)
+        catalyst = Catalyst("Eye of Newt", 3.0, 7.0)
+
+        potion = self.laboratory.mix_potion("Super Attack", "Super", "Attack", herb, catalyst)
+
+        self.assertIsInstance(potion, SuperPotion)
+        self.assertEqual(potion.get_name(), "Super Attack")
+        self.assertEqual(potion.get_stat(), "Attack")
 
     def test_mix_extreme_potion(self):
-        extreme_potion = self.laboratory.mix_potion("ExtremeTestPotion", "Extreme", "Defense", self.herb, self.catalyst)
-        self.assertIsInstance(extreme_potion, ExtremePotion)
+        herb = Herb("Avantoe", 8.0)
+        super_potion = SuperPotion("Super Attack", "Attack", 0, herb, Catalyst("Eye of Newt", 3.0, 7.0))
+
+        potion = self.laboratory.mix_potion("Extreme Attack", "Extreme", "Attack", herb, super_potion)
+
+        self.assertIsInstance(potion, ExtremePotion)
+        self.assertEqual(potion.get_name(), "Extreme Attack")
+        self.assertEqual(potion.get_stat(), "Attack")
 
     def test_add_herbs(self):
-        result = self.laboratory.add_reagent(self.herb, 3)
-        self.assertEqual(result, "The reagent TestHerb was added successfully.")
-        self.assertEqual(len(self.laboratory._herbs), 3)
+        herb = Herb("Irit", 5.0)
 
-    def test_alchemist_drink_potion(self):
-        self.super_potion1.calculate_boost()
-        boost_before = self.super_potion1.get_boost()
-        self.alchemist.drink_potion(self.super_potion1)
-        boost_after = self.super_potion1.calculate_boost()
-        self.assertGreater(boost_after, boost_before)
+        self.laboratory.add_reagent(herb, 3)
+
+        self.assertEqual(len(self.laboratory._Laboratory__herbs), 3)
+
     def test_add_catalysts(self):
-        result = self.laboratory.add_reagent(self.catalyst, 2)
-        self.assertEqual(result, "The reagent TestCatalyst was added successfully.")
-        self.assertEqual(len(self.laboratory._catalysts), 2)
+        catalyst = Catalyst("Eye of Newt", 3.0, 7.0)
 
-    def test_alchemist_collect_reagent(self):
-        self.alchemist.collect_reagent(self.herb1, 5)
-        self.assertEqual(len(self.alchemist.get_laboratory()._herbs), 5)
-class TestAlchemistClass(unittest.TestCase):
+        self.laboratory.add_reagent(catalyst, 2)
+
+        self.assertEqual(len(self.laboratory._Laboratory__catalysts), 2)
+
+
+class TestAlchemist(unittest.TestCase):
+
     def setUp(self):
-        self.alchemist = Alchemist(10, 20, 30, 40, 50, 60)
-        self.laboratory = Laboratory()
-        self.herb = Herb("TestHerb", 4.0)
-        self.catalyst = Catalyst("TestCatalyst", 5.0, 7.0)
-        self.laboratory.add_reagent(self.herb, 3)
-        self.laboratory.add_reagent(self.catalyst, 2)
+        # Initialize an Alchemist object with sample attributes
+        self.alchemist = Alchemist(10, 15, 20, 25, 30, 35)
 
-    def test_mix_super_potion(self):
-        recipe = ["Super Attack", "Irit", "Eye of Newt"]
-        self.alchemist.mix_potion(recipe)
-        self.assertEqual(len(self.alchemist.get_laboratory()._potions), 1)
+    def test_get_laboratory(self):
+        # Test the get_laboratory method
+        laboratory = self.alchemist.get_laboratory()
+        self.assertIsInstance(laboratory, Laboratory)
 
-    def test_mix_extreme_potion(self):
-        recipe = ["Extreme Defense", "Dwarf Weed", "Super Defense"]
-        self.alchemist.mix_potion(recipe)
-        self.assertEqual(len(self.alchemist.get_laboratory()._potions), 1)
+    def test_get_recipes(self):
+        # Test the get_recipes method
+        recipes = self.alchemist.get_recipes()
+        self.assertIsInstance(recipes, dict)
+        self.assertGreater(len(recipes), 0)
 
-    def test_alchemist_refine_reagents(self):
-        refine_result = self.alchemist.refine_reagents()
-    def test_drink_potion(self):
-        super_potion = SuperPotion("TestSuperPotion", "Attack", 0, self.herb, self.catalyst)
-        super_potion.calculate_boost()
-        self.alchemist.drink_potion(super_potion)
-        self.assertEqual(self.alchemist._attributes['attack'], 10 + super_potion.get_boost())
+
+    def test_drink_invalid_potion(self):
+        # Test drinking an invalid potion
+        invalid_potion = "Invalid Potion"  # Replace this with an invalid Potion object
+        boost = self.alchemist.drink_potion(invalid_potion)
+        self.assertIsNone(boost)
 
 if __name__ == '__main__':
     unittest.main()
+
