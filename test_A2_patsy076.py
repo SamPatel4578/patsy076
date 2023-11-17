@@ -1,5 +1,5 @@
 """
-File: A2_patsy076.py
+File: test_A2_patsy076.py
 Description: This assignment is for Assignment 2 of Object-Oriented Programming.
 Author: Saumya Patel
 StudentID: 110402464
