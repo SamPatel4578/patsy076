@@ -33,38 +33,38 @@ class Potion(ABC):
         self.__boost = new_boost
 
 class SuperPotion(Potion):
-    def _init_(self, name, stat, boost, herb, catalyst):
-        super()._init_(name, stat, boost)
+    def __init__(self, name, stat, boost, herb, catalyst):
+        super().__init__(name, stat, boost)
         self.__herb = herb
         self.__catalyst = catalyst
+        self.calculate_boost()
 
-    def calculateBoost(self):
-        pass
+    def calculate_boost(self):
+        self.set_boost(round(self.__herb.get_potency() + (self.__catalyst.get_potency() * self.__catalyst.get_quality()) * 1.5, 2))
 
-    def getHerb(self):
-        pass
+    def get_herb(self):
+        return self.__herb
 
-    def getCatalyst(self):
-        pass
-
+    def get_catalyst(self):
+        return self.__catalyst
 
 class ExtremePotion(Potion):
-    def _init_(self, name, stat, boost, reagent, potion):
-        super()._init_(name, stat, boost)
+    def __init__(self, name, stat, boost, reagent, potion):
+        super().__init__(name, stat, boost)
         self.__reagent = reagent
         self.__potion = potion
 
-    def calculateBoost(self):
-        pass
+    def calculate_boost(self):
+        self.set_boost(round((self.__reagent.get_potency() * self.__potion.get_boost()) * 3.0, 2))
 
-    def getReagent(self):
-        pass
+    def get_reagent(self):
+        return self.__reagent
 
-    def getPotion(self):
-        pass
-
+    def get_potion(self):
+        return self.__potion
+    
 class Reagent(ABC):
-    def _init_(self, name, potency):
+    def __init__(self, name, potency):
         self.__name = name
         self.__potency = potency
 
@@ -72,47 +72,48 @@ class Reagent(ABC):
     def refine(self):
         pass
 
-    def getName(self):
+    def get_name(self):
         return self.__name
 
-    def getPotency(self):
+    def get_potency(self):
         return self.__potency
 
-    def setPotency(self, newPotency):
-        self.__potency = newPotency
+    def set_potency(self, new_potency):
+        self.__potency = new_potency
+
 
 class Herb(Reagent):
-    def _init_(self, name, potency, grimy = True):
-        super()._init_(name, potency)
+    def __init__(self, name, potency, grimy=True):
+        super().__init__(name, potency)
         self.__grimy = grimy
 
     def refine(self):
-        self.setGrimy()
-        self.__potency = self.__potency * 2.5
-        print(f"The herb potency will increase 2.5 times its original and its not grimy")
+        self.set_grimy()
+        self.__potency = self.__potency * 2.5 
+        print(f"The herb is not grimy, and its potency is 2.5 times its original.")
 
-    def getGrimy(self):
+    def get_grimy(self):
         return self.__grimy
 
-    def setGrimy(self, grimy):
-        self.__grimy = False
+    def set_grimy(self, grimy=False):
+        self.__grimy = grimy
 
 class Catalyst(Reagent):
-    def _init_(self, name, potency, quality):
-        super()._init_(name, potency)
+    def __init__(self, name, potency, quality):
+        super().__init__(name, potency)
         self.__quality = quality
 
     def refine(self):
-       if self.__quality < 8.9:
+        if self.__quality < 8.9:
             self.__quality += 1.1
-            print(f"Quality of the herb has increased by 1.1 The new quality is {self.__quality}")
+            print(f"Quality of the herb has increased by 1.1. The new quality is {self.__quality}")
 
-       elif self.__quality >= 8.9:
-           self.__quality = 10
-           print(f"The quality of the herb is at its maximum: {self.__quality}. It cannot be refined any furthur.")
+        elif self.__quality >= 8.9:
+            self.__quality = 10
+            print(f"The quality of the herb is at its maximum: {self.__quality}. It cannot be refined any further.")
 
-    def getQuality(self):
-       return self.__quality
+    def get_quality(self):
+        return self.__quality
 
 class Laboratory:
     def _init_(self):
