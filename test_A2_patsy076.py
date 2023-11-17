@@ -1,3 +1,12 @@
+"""
+File: A2_patsy076.py
+Description: This assignment is for Assignment 2 of Object-Oriented Programming.
+Author: Saumya Patel
+StudentID: 110402464
+EmailID: patsy076@mymail.unisa.edu.au
+This is my own work as defined by the University's Academic Misconduct Policy.
+"""
+
 import unittest
 from A2_patsy076 import *
 
@@ -189,24 +198,20 @@ class TestLaboratory(unittest.TestCase):
 class TestAlchemist(unittest.TestCase):
 
     def setUp(self):
-        # Initialize an Alchemist object with sample attributes
         self.alchemist = Alchemist(10, 15, 20, 25, 30, 35)
 
     def test_get_laboratory(self):
-        # Test the get_laboratory method
         laboratory = self.alchemist.get_laboratory()
         self.assertIsInstance(laboratory, Laboratory)
 
     def test_get_recipes(self):
-        # Test the get_recipes method
         recipes = self.alchemist.get_recipes()
         self.assertIsInstance(recipes, dict)
         self.assertGreater(len(recipes), 0)
 
 
     def test_drink_invalid_potion(self):
-        # Test drinking an invalid potion
-        invalid_potion = "Invalid Potion"  # Replace this with an invalid Potion object
+        invalid_potion = "Invalid Potion" 
         boost = self.alchemist.drink_potion(invalid_potion)
         self.assertIsNone(boost)
 

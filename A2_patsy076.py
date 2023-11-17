@@ -70,8 +70,8 @@ class SuperPotion(Potion):
         self.calculate_boost()
 
     def calculate_boost(self):
-        self.set_boost(round(self.__herb.get_potency() + (self.__catalyst.get_potency() * self.__catalyst.get_quality()) * 1.5, 2))
-
+        boost = round(self.__herb.get_potency() + (self.__catalyst.get_potency() * self.__catalyst.get_quality()) * 1.5, 2)
+        self.set_boost(boost)
 
     def get_herb(self):
         return self.__herb
