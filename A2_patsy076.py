@@ -116,20 +116,21 @@ class Catalyst(Reagent):
         return self.__quality
 
 class Laboratory:
-    def _init_(self):
+    def __init__(self):
         self.__potions = []
         self.__herbs = []
         self.__catalysts = []
 
-    def mixPotion(self, name, type, stat, primaryIngredient, secondaryIngredient):
-        if type == "Super":
-            potion = SuperPotion(name, stat, primaryIngredient, secondaryIngredient)
-        elif type == "Extreme":
-            potion = ExtremePotion(name, stat, primaryIngredient, secondaryIngredient)
+    def mix_potion(self, name, type, stat, primary_ingredient, secondary_ingredient):
+        if type == "Super" and (isinstance(primary_ingredient, Herb) or isinstance(primary_ingredient, Catalyst)) and (isinstance(secondary_ingredient, Herb) or isinstance(secondary_ingredient, Catalyst)): 
+            potion = SuperPotion(name, stat, 0, primary_ingredient, secondary_ingredient)
+            potion.calculate_boost
+        elif type == "Extreme" and (isinstance(primary_ingredient, Herb) or isinstance(primary_ingredient, Catalyst)) and (isinstance(secondary_ingredient, SuperPotion)):
+            potion = ExtremePotion(name, stat, 0, primary_ingredient, secondary_ingredient)
         self.__potions.append(potion)
         return potion 
 
-    def addReagent(self, reagent, amount):
+    def add_reagent(self, reagent, amount):
         if isinstance(reagent, Herb):
             for herb in range(0, amount-1):
                 self.__herbs.append(reagent)
@@ -140,30 +141,38 @@ class Laboratory:
 
 
 class Alchemist:
-       def _init_(self, attack, strength, defense, magic, ranged, necromancy):
-        self.__attributes = {"attack":attack, "strength":strength, "defense":defense, "magic":magic, "ranged":ranged, "necromancy":necromancy}
+    def __init__(self, attack, strength, defense, magic, ranged, necromancy):
+        self.__attributes = {"attack": attack, "strength": strength, "defense": defense, "magic": magic, "ranged": ranged, "necromancy": necromancy}
         self.__laboratory = Laboratory()
-        self.__recipes = {}
+        self.__recipes = {"Super Attack" : ["Irit", "Eye of Newt"], "Super Strength" : ["Kwuarm", "Limpwurt Root"], "Super Defense" : ["Cadantine", "White Berries"], "Super Magic" : ["Lantadyme, Potato Cactus"],
+                          "Super Ranging" : ["Dwarf Weed", "Wine of Zamorak"], "Super Necromancy" : ["Arbuck", "Blood of Orcus"], "Extreme Attack" : ["Avantoe", "Super Attack"], "Extreme Strength" : ["Dwarf Weed", "Super Strength"],
+                          "Extreme Defense" : ["Lantadyme", "Super Defense"], "Extreme Magic" : ["Ground Mud Rune", "Super Magic"], "Extreme Ranging" : ["Grenwall Spike", "Super Ranging"], "Extreme necromancy" : ["Ground Miasma Rune", "Super Necromancy"]}
 
-        def getLaboratory(self):
-            return self.__laboratory
+    def get_laboratory(self):
+        return self.__laboratory
 
-        def getRecipes(self):
-            return self.__recipes
+    def get_recipes(self):
+        return self.__recipes
     
-        def addRecipe(self, potion, firstIngredient, secondIngredient):
-            for key, value in self.__attributes.items():
-                self.__recipes[potion] = (firstIngredient, secondIngredient)
-                print(f"The recipe for {potion} was added successfully")
-    
-        def mixPotion(self, recipe):
-            recipe.mixPotion()
+    def mix_potion(self, recipe):
+        if recipe in self.__recipes:
+            primary_ingredient = recipe[0]
+            secondary_ingredient = recipe[1]
+            stat = None
 
-        def drinkPotion(self, potion):
-            pass
+            if "Super" in recipe:
+                type = "Super"
+            else:
+                type = "Extreme"
 
-        def collectReagent(self, reagent, amount):
-            pass
+            potion = self.__laboratory.mix_potion(recipe, type, stat, primary_ingredient, secondary_ingredient)
+            print(f"The potion {recipe} was successfully created.")
 
-        def refineReagents(self):
-            pass
+        else:
+            print(f"Invlaid recipe.")
+
+            
+
+    def drink_potion(self, potion):
+        if isinstance(potion, Potion):
+            boost = potion.calculate
