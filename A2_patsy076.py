@@ -11,26 +11,26 @@ This is my own work as defined by the University's Academic Misconduct Policy.
 from abc import ABC, abstractmethod
 
 class Potion(ABC):
-    def _init_(self, name, stat, boost):
+    def __init__(self, name, stat, boost):
         self.__name = name 
         self.__stat = stat
         self.__boost = boost
 
     @abstractmethod
-    def calculateBoost(self):
+    def calculate_boost(self):
         pass
 
-    def getName(self):
-        pass
+    def get_name(self):
+        return self.__name
 
-    def getStat(self):
-        pass
+    def get_stat(self):
+        return self.__stat
 
-    def getBoost(self):
-        pass 
+    def get_boost(self):
+        return self.__boost
 
-    def setBoost(self, boost):
-        pass
+    def set_boost(self, new_boost):
+        self.__boost = new_boost
 
 class SuperPotion(Potion):
     def _init_(self, name, stat, boost, herb, catalyst):
